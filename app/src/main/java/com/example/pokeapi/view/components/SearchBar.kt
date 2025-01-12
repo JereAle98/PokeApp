@@ -21,11 +21,11 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit, onSearch: () -> Un
     TextField(
         value = query,
         onValueChange = onQueryChange,
-        label = { Text("Busca un Pokémon") },
+        label = { Text("Search") },
         singleLine = true,
         trailingIcon = {
             IconButton(onClick = onSearch) {
-                Icon(Icons.Default.Search, contentDescription = "Buscar")
+                Icon(Icons.Default.Search, contentDescription = "Search")
             }
         },
         modifier = Modifier

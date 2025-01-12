@@ -16,20 +16,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,16 +40,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.pokeapi.R
+import com.example.pokeapi.data.navigation.Routes
 import com.example.pokeapi.model.PokeModel
 import com.example.pokeapi.ui.theme.principal
+import com.example.pokeapi.view.components.BottomNav
 import com.example.pokeapi.view.components.SearchBar
 import com.example.pokeapi.viewModel.PokeListViewModel
 
@@ -104,6 +101,11 @@ fun PokeListView(pokeListViewModel: PokeListViewModel = hiltViewModel()) {
 @Composable
 fun PokemonList(pokemons: LazyPagingItems<PokeModel>, pokeListViewModel: PokeListViewModel) {
 
+    val navController = rememberNavController()
+    val navigationRoutes = listOf(
+        Routes.PokemonView,
+        Routes.ItemView
+    )
     Scaffold(
         topBar = {
             TopAppBar(
@@ -116,9 +118,10 @@ fun PokemonList(pokemons: LazyPagingItems<PokeModel>, pokeListViewModel: PokeLis
                 },
                 colors = TopAppBarDefaults.largeTopAppBarColors(principal),
                 modifier = Modifier.fillMaxWidth()
-
             )
-
+        },
+        bottomBar = {
+            BottomNav(navHostController = navController, routes = navigationRoutes)
         }
     ) { padding ->
 
@@ -222,7 +225,7 @@ fun PokemonScreen(viewModel: PokeListViewModel, name: String, closeClick: () -> 
 
 @Composable
 fun PokemonSearchScreen(viewModel: PokeListViewModel,pokemons: LazyPagingItems<PokeModel>) {
-    val pokemon = viewModel.pokemon.value
+    val pokemon = viewModel.pokemonDetail.value
     var query by remember { mutableStateOf("") }
 
 
@@ -237,7 +240,6 @@ fun PokemonSearchScreen(viewModel: PokeListViewModel,pokemons: LazyPagingItems<P
             onSearch = { viewModel.searchPokemon(query)
             showAlert = true}
         )
-
 
         if (pokemon != null) {
             if (showAlert){

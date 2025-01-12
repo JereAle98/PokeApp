@@ -1,6 +1,8 @@
 package com.example.pokeapi.data
 
+import com.example.pokeapi.data.response.PokeDetailResponse
 import com.example.pokeapi.data.response.PokeResponse
+import com.example.pokeapi.data.response.ResponseItemsWrapper
 import com.example.pokeapi.data.response.ResponseWrapper
 import retrofit2.Response
 import retrofit2.http.GET
@@ -12,5 +14,8 @@ interface PokeApiService {
     suspend fun getPokemon(@Query("offset")page: Int): ResponseWrapper
 
     @GET("pokemon/{name}")
-    suspend fun getDetailPokemon(@Path("name") name: String): Response<PokeResponse>
+    suspend fun getDetailPokemon(@Path("name") name: String): Response<PokeDetailResponse>
+
+    @GET("item")
+    suspend fun getItem(@Query("offset")page: Int): ResponseItemsWrapper
 }

@@ -3,7 +3,7 @@ package com.example.pokeapi.data
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.example.pokeapi.data.response.PokeDetailResponse
+import com.example.pokeapi.data.response.PokeResponse
 import com.example.pokeapi.model.DetailsModel
 import com.example.pokeapi.model.PokeModel
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +23,7 @@ class PokeRepository @Inject constructor(val api: PokeApiService) {
             }).flow
     }
 
-    suspend fun getPokemonByName(name: String): PokeDetailResponse? {
+    suspend fun getPokemonByName(name: String): PokeResponse? {
         val response = api.getDetailPokemon(name)
         if (response.isSuccessful){
             return response.body()

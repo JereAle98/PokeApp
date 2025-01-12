@@ -29,6 +29,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -54,8 +55,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.pokeapi.R
 import com.example.pokeapi.model.PokeModel
 import com.example.pokeapi.ui.theme.principal
+import com.example.pokeapi.view.components.SearchBar
 import com.example.pokeapi.viewModel.PokeListViewModel
-import java.util.Locale
 
 @Composable
 fun PokeListView(pokeListViewModel: PokeListViewModel = hiltViewModel()) {
@@ -102,6 +103,7 @@ fun PokeListView(pokeListViewModel: PokeListViewModel = hiltViewModel()) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PokemonList(pokemons: LazyPagingItems<PokeModel>, pokeListViewModel: PokeListViewModel) {
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -114,57 +116,67 @@ fun PokemonList(pokemons: LazyPagingItems<PokeModel>, pokeListViewModel: PokeLis
                 },
                 colors = TopAppBarDefaults.largeTopAppBarColors(principal),
                 modifier = Modifier.fillMaxWidth()
+
             )
+
         }
     ) { padding ->
-        LazyColumn(modifier = Modifier.padding(padding)) {
-            items(pokemons.itemCount) {
-                pokemons[it]?.let { pokeModel ->
-                    var showAlert by remember { mutableStateOf(false) }
-                    ListItem(
-                        {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { showAlert = true }) {
-                                Row {
-                                    Column {
-                                        Text(
-                                            pokeModel.name.uppercase()
-                                                ?: "No Title",
-                                            fontSize = 30.sp,
-                                            fontWeight = FontWeight.Normal
-                                        )
-                                    }
-                                }
-                                HorizontalDivider(
+
+        Column(modifier = Modifier.fillMaxSize().padding(padding)){
+            PokemonSearchScreen(pokeListViewModel,pokemons)
+            LazyColumn() {
+
+                items(pokemons.itemCount) {
+                    pokemons[it]?.let { pokeModel ->
+                        var showAlert by remember { mutableStateOf(false) }
+                        ListItem(
+                            {
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(5.dp)
-                                )
+                                        .clickable { showAlert = true }) {
+                                    Row {
+                                        Column {
+                                            Text(
+                                                pokeModel.name.uppercase()
+                                                    ?: "No Title",
+                                                fontSize = 30.sp,
+                                                fontWeight = FontWeight.Normal
+                                            )
+                                        }
+                                    }
+                                    HorizontalDivider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(5.dp)
+                                    )
+                                }
                             }
-                        }
-                    )
-                    val name = pokeModel.name
-                    if (showAlert) {
-                        PokemonScreen(
-                            viewModel = pokeListViewModel,
-                            name,
-                            closeClick = { showAlert = false }
                         )
+                        val name = pokeModel.name
+                        if (showAlert) {
+                            PokemonScreen(
+                                viewModel = pokeListViewModel,
+                                name,
+                                closeClick = { showAlert = false }
+                            )
+                        }
                     }
-                }
 
+                }
             }
+
         }
+
+
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PokemonScreen(viewModel: PokeListViewModel, name: String, closeClick: () -> Unit) {
-    val pokemon = viewModel.pokemon.value
-    viewModel.fetchPokemon(name)
+    val pokemon = viewModel.pokemonDetail.value
+    viewModel.fetchDetailPokemon(name)
     Box() {
         BasicAlertDialog(onDismissRequest = {}) {
 
@@ -204,6 +216,34 @@ fun PokemonScreen(viewModel: PokeListViewModel, name: String, closeClick: () -> 
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun PokemonSearchScreen(viewModel: PokeListViewModel,pokemons: LazyPagingItems<PokeModel>) {
+    val pokemon = viewModel.pokemon.value
+    var query by remember { mutableStateOf("") }
+
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        var showAlert by remember { mutableStateOf(false) }
+        SearchBar(
+            query = query,
+            onQueryChange = { query = it },
+            onSearch = { viewModel.searchPokemon(query)
+            showAlert = true}
+        )
+
+
+        if (pokemon != null) {
+            if (showAlert){
+                PokemonScreen(viewModel,pokemon.name, closeClick = {showAlert = false})
+            }
+
         }
     }
 }

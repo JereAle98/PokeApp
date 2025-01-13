@@ -21,19 +21,12 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class PokeListViewModel @Inject constructor
-    (private val pokeRepository: PokeRepository): ViewModel(){
+class PokeListViewModel @Inject constructor(private val pokeRepository: PokeRepository): ViewModel(){
 
-    private val _pokemon = mutableStateOf<PokeResponse?>(null)
-    val pokemon: State<PokeResponse?> = _pokemon
-
-
-    private val _pokemonDetail = MutableStateFlow<PokeDetailResponse?>(null)
-    val pokemonDetail: Flow<PokeDetailResponse?> get() = _pokemonDetail
+    private val _pokemonDetail = mutableStateOf<PokeDetailResponse?>(null)
+    val pokemonDetail: State<PokeDetailResponse?> get() = _pokemonDetail
 
     val pokemons: Flow<PagingData<PokeModel>> = pokeRepository.getAllPokemons()
-
-
 
     fun fetchDetailPokemon(name: String) {
         viewModelScope.launch {

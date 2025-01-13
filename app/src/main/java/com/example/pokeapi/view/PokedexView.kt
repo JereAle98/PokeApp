@@ -27,9 +27,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,8 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,6 +61,7 @@ import com.example.pokeapi.viewModel.PokeListViewModel
 @Composable
 fun PokeListView(pokeListViewModel: PokeListViewModel = hiltViewModel()) {
     val pokemons = pokeListViewModel.pokemons.collectAsLazyPagingItems()
+    val searchQuery = remember { mutableStateOf("") }
 
     when {
 
@@ -85,7 +88,7 @@ fun PokeListView(pokeListViewModel: PokeListViewModel = hiltViewModel()) {
         }
 
         else -> {
-            PokemonList(pokemons, pokeListViewModel)
+            PokemonList(pokemons, pokeListViewModel, searchQuery)
 
             if (pokemons.loadState.append is LoadState.Loading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -100,7 +103,11 @@ fun PokeListView(pokeListViewModel: PokeListViewModel = hiltViewModel()) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PokemonList(pokemons: LazyPagingItems<PokeModel>, pokeListViewModel: PokeListViewModel) {
+fun PokemonList(
+    pokemons: LazyPagingItems<PokeModel>,
+    pokeListViewModel: PokeListViewModel,
+    searchQuery: MutableState<String>
+) {
 
     val navController = rememberNavController()
     val navigationRoutes = listOf(
@@ -127,52 +134,25 @@ fun PokemonList(pokemons: LazyPagingItems<PokeModel>, pokeListViewModel: PokeLis
     ) { padding ->
 
         Column(modifier = Modifier.fillMaxSize().padding(padding)){
-            PokemonSearchScreen(pokeListViewModel,pokemons)
+            PokemonSearchScreen(searchQuery)
             LazyColumn() {
 
                 items(pokemons.itemCount) {
-                    pokemons[it]?.let { pokeModel ->
-                        var showAlert by remember { mutableStateOf(false) }
-                        ListItem(
-                            {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { showAlert = true }) {
-                                    Row {
-                                        Column {
-                                            Text(
-                                                pokeModel.name.uppercase()
-                                                    ?: "No Title",
-                                                fontSize = 30.sp,
-                                                fontWeight = FontWeight.Normal
-                                            )
-                                        }
-                                    }
-                                    HorizontalDivider(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(5.dp)
-                                    )
-                                }
+                    if (searchQuery.value.isNotEmpty()){
+                        if (pokemons[it]?.name?.contains(searchQuery.value, ignoreCase = true) == true){
+                            pokemons[it]?.let { pokeModel ->
+                                RenderItem(pokeModel, pokeListViewModel)
                             }
-                        )
-                        val name = pokeModel.name
-                        if (showAlert) {
-                            PokemonScreen(
-                                viewModel = pokeListViewModel,
-                                name,
-                                closeClick = { showAlert = false }
-                            )
+                        }
+                    } else {
+                        pokemons[it]?.let { pokeModel ->
+                            RenderItem(pokeModel, pokeListViewModel)
                         }
                     }
-
                 }
             }
 
         }
-
-
     }
 }
 
@@ -200,7 +180,7 @@ fun PokemonScreen(viewModel: PokeListViewModel, name: String, closeClick: () -> 
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
 
-                    ) {
+                        ) {
                         Text(text = name.uppercase(), color = Color.Black)
                         IconButton(onClick = { closeClick() }
                         ) {
@@ -224,25 +204,69 @@ fun PokemonScreen(viewModel: PokeListViewModel, name: String, closeClick: () -> 
 }
 
 @Composable
-fun PokemonSearchScreen(viewModel: PokeListViewModel,pokemons: LazyPagingItems<PokeModel>) {
-    val pokemon = viewModel.pokemonDetail.value
-    var query by remember { mutableStateOf("") }
-
+fun PokemonSearchScreen( searchQuery: MutableState<String>) {
+    //viewModel: PokeListViewModel, pokemons: LazyPagingItems<PokeModel>,
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         var showAlert by remember { mutableStateOf(false) }
-        SearchBar(
-            query = query,
-            onQueryChange = { query = it },
-            onSearch = { viewModel.searchPokemon(query)
-            showAlert = true}
+//        SearchBar(
+//            query = query,
+//            onQueryChange = { query = it },
+//            onSearch = { viewModel.searchPokemon(query)
+//            showAlert = true}
+//        )
+
+        TextField(
+            value = searchQuery.value,
+            onValueChange = { searchQuery.value = it },
+            label = { Text("Enter Pokémon") },
+            modifier = Modifier.fillMaxWidth()
         )
 
-        if (pokemon != null && showAlert) {
-            PokemonScreen(viewModel,query, closeClick = {showAlert = false})
 
-        }
+//        if (pokemon != null && showAlert) {
+//            PokemonScreen(viewModel,query, closeClick = {showAlert = false})
+//
+//        }
     }
+}
+
+@Composable
+fun RenderItem(pokeModel: PokeModel, viewModel: PokeListViewModel) {
+    var showAlert by remember { mutableStateOf(false) }
+    ListItem(
+        {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showAlert = true }) {
+                Row {
+                    Column {
+                        Text(
+                            pokeModel.name.uppercase()
+                                ?: "No Title",
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
+                }
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(5.dp)
+                )
+            }
+        }
+    )
+    val name = pokeModel.name
+    if (showAlert) {
+        PokemonScreen(
+            viewModel = viewModel,
+            name,
+            closeClick = { showAlert = false }
+        )
+    }
+
 }

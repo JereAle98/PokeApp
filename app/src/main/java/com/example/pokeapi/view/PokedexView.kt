@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,7 +49,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.pokeapi.R
-import com.example.pokeapi.data.navigation.Routes
+import com.example.pokeapi.navigation.Routes
 import com.example.pokeapi.model.PokeModel
 import com.example.pokeapi.ui.theme.principal
 import com.example.pokeapi.view.components.BottomNav
@@ -77,9 +78,9 @@ fun PokeListView(pokeListViewModel: PokeListViewModel = hiltViewModel()) {
             Box(
                 Modifier
                     .fillMaxSize()
-                    .background(Color.Red), contentAlignment = Alignment.Center
+                    .background(principal), contentAlignment = Alignment.Center
             ) {
-                Text(text = "Ha ocurrido un error")
+                Text(text = "Ha ocurrido un error", color = Color.White)
             }
         }
 
@@ -208,10 +209,9 @@ fun PokemonScreen(viewModel: PokeListViewModel, name: String, closeClick: () -> 
                     }
 
                     pokemon?.let {
-                        // Mostrar tipos
+
                         Text("TYPES: ${it.types.joinToString { type -> type.type.name.uppercase() }}",color = Color.Black)
 
-                        // Mostrar habilidades
                         Text("ABILITIES: ${it.abilities.joinToString { ability -> ability.ability.name.uppercase() }}",color = Color.Black)
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -228,7 +228,6 @@ fun PokemonSearchScreen(viewModel: PokeListViewModel,pokemons: LazyPagingItems<P
     val pokemon = viewModel.pokemonDetail.value
     var query by remember { mutableStateOf("") }
 
-
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -241,10 +240,8 @@ fun PokemonSearchScreen(viewModel: PokeListViewModel,pokemons: LazyPagingItems<P
             showAlert = true}
         )
 
-        if (pokemon != null) {
-            if (showAlert){
-                PokemonScreen(viewModel,pokemon.name, closeClick = {showAlert = false})
-            }
+        if (pokemon != null && showAlert) {
+            PokemonScreen(viewModel,query, closeClick = {showAlert = false})
 
         }
     }

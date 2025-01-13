@@ -28,10 +28,12 @@ class PokeListViewModel @Inject constructor
     val pokemon: State<PokeResponse?> = _pokemon
 
 
-    private val _pokemonDetail = mutableStateOf<PokeDetailResponse?>(null)
-    val pokemonDetail: State<PokeDetailResponse?> get() = _pokemonDetail
+    private val _pokemonDetail = MutableStateFlow<PokeDetailResponse?>(null)
+    val pokemonDetail: Flow<PokeDetailResponse?> get() = _pokemonDetail
 
     val pokemons: Flow<PagingData<PokeModel>> = pokeRepository.getAllPokemons()
+
+
 
     fun fetchDetailPokemon(name: String) {
         viewModelScope.launch {
@@ -47,7 +49,8 @@ class PokeListViewModel @Inject constructor
     fun searchPokemon(query: String) {
         viewModelScope.launch {
             try {
-                val result = pokeRepository.getPokemonByName(query.lowercase())
+                val searchQuery = query.lowercase()
+                val result = pokeRepository.getPokemonByName(searchQuery)
                 _pokemonDetail.value = result
             } catch (e: Exception) {
                 _pokemonDetail.value = null // Manejar errores

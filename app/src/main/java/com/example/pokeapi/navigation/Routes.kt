@@ -1,4 +1,4 @@
-package com.example.pokeapi.data.navigation
+package com.example.pokeapi.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email

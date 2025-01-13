@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.pokeapi.ui.theme.PokeApiTheme
+import com.example.pokeapi.view.HomeView
 import com.example.pokeapi.view.PokeListView
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +23,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PokeApiTheme {
-                PokeListView()
+                HomeView()
             }
 
         }

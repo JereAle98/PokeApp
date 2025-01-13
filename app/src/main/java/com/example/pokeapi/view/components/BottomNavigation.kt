@@ -10,7 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.pokeapi.data.navigation.Routes
+import com.example.pokeapi.navigation.Routes
 
 @Composable
 fun BottomNav(navHostController: NavHostController, routes: List<Routes>){

@@ -128,9 +128,7 @@ fun PokemonList(
                 modifier = Modifier.fillMaxWidth()
             )
         },
-        bottomBar = {
-            BottomNav(navHostController = navController, routes = navigationRoutes)
-        }
+
     ) { padding ->
 
         Column(modifier = Modifier.fillMaxSize().padding(padding)){

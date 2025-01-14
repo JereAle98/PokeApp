@@ -1,5 +1,7 @@
 package com.example.pokeapi.data
 
+import com.example.pokeapi.data.response.FormResponse
+import com.example.pokeapi.data.response.ImageResponse
 import com.example.pokeapi.data.response.PokeDetailResponse
 import com.example.pokeapi.data.response.PokeResponse
 import com.example.pokeapi.data.response.ResponseItemsWrapper
@@ -12,10 +14,14 @@ import retrofit2.http.Query
 interface PokeApiService {
     @GET("pokemon")
     suspend fun getPokemon(@Query("offset")page: Int): ResponseWrapper
-
+    
     @GET("pokemon/{name}")
     suspend fun getDetailPokemon(@Path("name") name: String): Response<PokeDetailResponse>
 
     @GET("item")
     suspend fun getItem(@Query("offset")page: Int): ResponseItemsWrapper
+
+    @GET("pokemon-form/{name}")
+    suspend fun getPokemonImage(@Path("name") name: String): Response<FormResponse>
+
 }

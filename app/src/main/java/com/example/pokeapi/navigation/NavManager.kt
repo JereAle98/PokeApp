@@ -1,5 +1,6 @@
 package com.example.pokeapi.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -9,13 +10,13 @@ import com.example.pokeapi.view.PokeListView
 
 
 @Composable
-fun NavManager(navHostController: NavHostController){
+fun NavManager(navHostController: NavHostController, paddingValues: PaddingValues){
     NavHost(navController = navHostController, startDestination = Routes.PokemonView.route){
         composable(Routes.PokemonView.route) {
-            PokeListView()
+            PokeListView(paddingValues = paddingValues)
         }
         composable(Routes.ItemView.route) {
-            ItemListView()
+            ItemListView(paddingValues = paddingValues)
         }
 
     }

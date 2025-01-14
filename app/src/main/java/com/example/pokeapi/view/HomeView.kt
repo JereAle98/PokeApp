@@ -16,8 +16,8 @@ import com.example.pokeapi.navigation.NavManager
 import com.example.pokeapi.navigation.Routes
 import com.example.pokeapi.ui.theme.principal
 import com.example.pokeapi.view.components.BottomNav
+import com.example.pokeapi.view.components.TopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeView(){
@@ -28,11 +28,13 @@ fun HomeView(){
     )
 
     Scaffold(
-
+        topBar = {
+            TopBar()
+        },
         bottomBar ={
             BottomNav(navController, navigationRoutes )
         }
-    ){
-        NavManager(navController)
+    ){padding ->
+        NavManager(navController, padding)
     }
 }

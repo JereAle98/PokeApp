@@ -43,3 +43,12 @@ data class TypeResponse (
     @SerializedName("name") val name: String,
     @SerializedName("url") val url: String
 )
+
+data class FormResponse(
+    @SerializedName("sprites") val sprites: ImageResponse
+)
+
+data class ImageResponse(
+    @SerializedName("front_default") val imageFront: String,
+    @SerializedName("back_default") val imageBack: String
+)
